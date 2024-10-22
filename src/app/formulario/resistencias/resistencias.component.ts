@@ -26,7 +26,20 @@ export class ResistenciasComponent {
   valor: number = 0;
   minimo: number = 0;
   maximo: number = 0;
-  mostrarTabla: boolean = false; // Propiedad para controlar la visibilidad de la tabla
+  mostrarTabla: boolean = false;
+
+  // Constructor para cargar las resistencias desde el localStorage al iniciar el componente
+  constructor() {
+    this.cargarResistencias();
+  }
+
+  // Método para cargar resistencias desde el localStorage
+  cargarResistencias() {
+    const datosGuardados = localStorage.getItem('resistencias');
+    if (datosGuardados) {
+      this.resistenciasGuardadas = JSON.parse(datosGuardados);
+    }
+  }
 
   // Método para guardar resistencia en local storage
   guardarResistencia() {
@@ -62,7 +75,7 @@ export class ResistenciasComponent {
   calcularMinimo(): number {
     return this.toleranciaColor === 'dorado' ? this.valor * 0.95 : this.valor * 0.90; // ±5% o ±10%
   }
-  
+
   // Método para calcular el valor máximo
   calcularMaximo(): number {
     return this.toleranciaColor === 'dorado' ? this.valor * 1.05 : this.valor * 1.10; // ±5% o ±10%
@@ -81,9 +94,9 @@ export class ResistenciasComponent {
       case 'violeta': return 7;
       case 'gris': return 8;
       case 'blanco': return 9;
-      case 'dorado': return -1; // No aplicable
-      case 'plateado': return -2; // No aplicable
-      default: return -1; // Color no válido
+      case 'dorado': return -1;
+      case 'plateado': return -2;
+      default: return -1;
     }
   }
 
@@ -108,6 +121,6 @@ export class ResistenciasComponent {
       'dorado': '#FFD700',
       'plateado': '#C0C0C0'
     };
-    return colores[color] || '#FFFFFF'; // Color por defecto blanco
+    return colores[color] || '#FFFFFF';
   }
 }
