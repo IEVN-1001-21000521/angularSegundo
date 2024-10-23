@@ -21,69 +21,108 @@ export class EmpleadoComponent {
     correo: string,
     edad: number,
     horasTrabajadas: number,
-    pago: number
+    horasExtras: number,
+    pagoHorasRegulares: number,
+    pagoHorasExtras: number,
+    pagoTotal: number
   }> = [];
   mostrarTabla: boolean = false;
-  filtroMatricula: string = '';  // Nueva propiedad para filtrar por matrícula
+  filtroMatricula: string = '';
+  modoEdicion: boolean = false;
+  indiceEdicion: number | null = null;
 
-  // Método para registrar empleado
+  constructor() {
+    const empleadosEnLocalStorage = localStorage.getItem('empleados');
+    if (empleadosEnLocalStorage) {
+      this.empleadosGuardados = JSON.parse(empleadosEnLocalStorage);
+    }
+  }
+
+  // Método para registrar o modificar empleado
   registrarEmpleado() {
     if (this.matricula && this.nombre && this.correo && this.edad && this.horasTrabajadas !== null) {
+      const pagoHorasRegulares = this.calcularPagoHorasRegulares(this.horasTrabajadas);
+      const pagoHorasExtras = this.calcularPagoHorasExtras(this.horasTrabajadas);
+      const horasExtras = this.calcularHorasExtras(this.horasTrabajadas);
+      const pagoTotal = pagoHorasRegulares + pagoHorasExtras;
+
       const nuevoEmpleado = {
         matricula: this.matricula,
         nombre: this.nombre,
         correo: this.correo,
         edad: this.edad,
         horasTrabajadas: this.horasTrabajadas,
-        pago: this.calcularPago(this.horasTrabajadas)
+        horasExtras: horasExtras,
+        pagoHorasRegulares: pagoHorasRegulares,
+        pagoHorasExtras: pagoHorasExtras,
+        pagoTotal: pagoTotal
       };
 
-      this.empleadosGuardados.push(nuevoEmpleado);
-      localStorage.setItem('empleados', JSON.stringify(this.empleadosGuardados));
-      alert('Empleado registrado con éxito.');
+      if (this.modoEdicion && this.indiceEdicion !== null) {
+        // Modificar empleado existente
+        this.empleadosGuardados[this.indiceEdicion] = nuevoEmpleado;
+        this.modoEdicion = false;
+        this.indiceEdicion = null;
+        alert('Empleado modificado con éxito.');
+      } else {
+        // Registrar nuevo empleado
+        this.empleadosGuardados.push(nuevoEmpleado);
+        alert('Empleado registrado con éxito.');
+      }
+
+      this.actualizarLocalStorage();
       this.limpiarCampos();
     } else {
       alert('Por favor, llena todos los campos.');
     }
   }
 
-  // Método para calcular el pago
-  calcularPago(horas: number): number {
+  // Método para calcular el pago de horas regulares (hasta 40 horas)
+  calcularPagoHorasRegulares(horas: number): number {
     const pagoPorHora = 70;
+    return horas > 40 ? 40 * pagoPorHora : horas * pagoPorHora;
+  }
+
+  // Método para calcular el pago de horas extras (más de 40 horas)
+  calcularPagoHorasExtras(horas: number): number {
     const pagoPorHoraExtra = 140;
-    return horas > 40 ? (40 * pagoPorHora) + ((horas - 40) * pagoPorHoraExtra) : horas * pagoPorHora;
+    return horas > 40 ? (horas - 40) * pagoPorHoraExtra : 0;
   }
 
-  // Método para imprimir la tabla
-  imprimirTabla() {
-    this.mostrarTabla = true;
+  // Método para calcular las horas extras trabajadas
+  calcularHorasExtras(horas: number): number {
+    return horas > 40 ? horas - 40 : 0;
   }
 
-  // Método para modificar empleado por matrícula
-  modificarEmpleado() {
-    const empleado = this.empleadosGuardados.find(emp => emp.matricula === this.matricula);
+  // Método para iniciar la modificación de un empleado por matrícula
+  iniciarModificacion(matricula: string) {
+    const empleado = this.empleadosGuardados.find((emp, index) => {
+      if (emp.matricula === matricula) {
+        this.indiceEdicion = index;
+        return true;
+      }
+      return false;
+    });
+
     if (empleado) {
-      empleado.nombre = this.nombre;
-      empleado.correo = this.correo;
-      empleado.edad = this.edad || 0;
-      empleado.horasTrabajadas = this.horasTrabajadas || 0;
-      empleado.pago = this.calcularPago(empleado.horasTrabajadas);
-      localStorage.setItem('empleados', JSON.stringify(this.empleadosGuardados));
-      alert('Empleado modificado con éxito.');
-      this.limpiarCampos();
+      this.matricula = empleado.matricula;
+      this.nombre = empleado.nombre;
+      this.correo = empleado.correo;
+      this.edad = empleado.edad;
+      this.horasTrabajadas = empleado.horasTrabajadas;
+      this.modoEdicion = true;
     } else {
       alert('Empleado no encontrado.');
     }
   }
 
   // Método para eliminar empleado por matrícula
-  eliminarEmpleado() {
-    const index = this.empleadosGuardados.findIndex(emp => emp.matricula === this.matricula);
+  eliminarEmpleado(matricula: string) {
+    const index = this.empleadosGuardados.findIndex(emp => emp.matricula === matricula);
     if (index !== -1) {
       this.empleadosGuardados.splice(index, 1);
-      localStorage.setItem('empleados', JSON.stringify(this.empleadosGuardados));
+      this.actualizarLocalStorage();
       alert('Empleado eliminado con éxito.');
-      this.limpiarCampos();
     } else {
       alert('Empleado no encontrado.');
     }
@@ -96,6 +135,18 @@ export class EmpleadoComponent {
     this.correo = '';
     this.edad = null;
     this.horasTrabajadas = null;
+    this.modoEdicion = false;
+    this.indiceEdicion = null;
+  }
+
+  // Método para actualizar los empleados en el localStorage
+  actualizarLocalStorage() {
+    localStorage.setItem('empleados', JSON.stringify(this.empleadosGuardados));
+  }
+
+  // Método para calcular el total de dinero a pagar a todos los empleados
+  calcularTotalGeneral(): number {
+    return this.empleadosGuardados.reduce((total, empleado) => total + empleado.pagoTotal, 0);
   }
 
   // Método para filtrar empleados por matrícula
@@ -105,10 +156,18 @@ export class EmpleadoComponent {
     correo: string,
     edad: number,
     horasTrabajadas: number,
-    pago: number
+    horasExtras: number,
+    pagoHorasRegulares: number,
+    pagoHorasExtras: number,
+    pagoTotal: number
   }> {
     return this.empleadosGuardados.filter(emp =>
       emp.matricula.toLowerCase().includes(this.filtroMatricula.toLowerCase())
     );
+  }
+
+  // Método para mostrar u ocultar la tabla
+  imprimirTabla() {
+    this.mostrarTabla = !this.mostrarTabla; // Alterna la visibilidad de la tabla
   }
 }
