@@ -1,7 +1,6 @@
 <div class="container mx-auto p-4">
   <h1 class="text-2xl font-bold mb-4">Registro de Empleados</h1>
 
-  <!-- Formulario de Registro -->
   <div class="flex">
     <div class="mr-8">
       <div class="mb-4">
@@ -29,25 +28,15 @@
         <input [(ngModel)]="horasTrabajadas" type="number" id="horasTrabajadas" class="border border-gray-300 rounded p-2 w-full" />
       </div>
 
-      <!-- Mostrar el botón de Aceptar Cambios solo si se está modificando -->
       <button *ngIf="modoEdicion" (click)="registrarEmpleado()" class="py-2 px-3 border border-black rounded w-full mb-4">Aceptar Cambios</button>
-
-      <!-- Botón para registrar empleado -->
       <button *ngIf="!modoEdicion" (click)="registrarEmpleado()" class="py-2 px-3 border border-black rounded w-full mb-4">Registrar</button>
     </div>
 
-    <!-- Tabla de Empleados -->
     <div>
       <button (click)="imprimirTabla()" class="py-2 px-3 border border-black rounded mb-4">Imprimir Tabla</button>
 
       <div *ngIf="mostrarTabla" class="mt-4">
         <h3 class="font-bold">Empleados Registrados:</h3>
-
-        <!-- Campo de búsqueda visible solo cuando la tabla está activa -->
-        <div class="mb-4">
-          <label class="block mb-2" for="filtroMatricula">Buscar por Matrícula:</label>
-          <input [(ngModel)]="filtroMatricula" id="filtroMatricula" class="border border-gray-300 rounded p-2 w-full" placeholder="Ingrese matrícula a buscar" />
-        </div>
 
         <table class="table-auto border-collapse border border-gray-300 w-full">
           <thead>
@@ -56,28 +45,36 @@
               <th class="border border-gray-300 px-4 py-2">Nombre</th>
               <th class="border border-gray-300 px-4 py-2">Correo</th>
               <th class="border border-gray-300 px-4 py-2">Edad</th>
-              <th class="border border-gray-300 px-4 py-2">Horas Trabajadas</th>
+              <th class="border border-gray-300 px-4 py-2">Horas Totales Trabajadas</th>
+              <th class="border border-gray-300 px-4 py-2">Horas por Pagar Dinero</th>
               <th class="border border-gray-300 px-4 py-2">Horas Extras</th>
-              <th class="border border-gray-300 px-4 py-2">Pago Total</th>
-              <th class="border border-gray-300 px-4 py-2">Acciones</th>
+              <th class="border border-gray-300 px-4 py-2">Subtotal</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let empleado of filtrarEmpleados()">
+            <tr *ngFor="let empleado of empleadosGuardados">
               <td class="border border-gray-300 px-4 py-2">{{ empleado.matricula }}</td>
               <td class="border border-gray-300 px-4 py-2">{{ empleado.nombre }}</td>
               <td class="border border-gray-300 px-4 py-2">{{ empleado.correo }}</td>
               <td class="border border-gray-300 px-4 py-2">{{ empleado.edad }}</td>
               <td class="border border-gray-300 px-4 py-2">{{ empleado.horasTrabajadas }}</td>
+              <td class="border border-gray-300 px-4 py-2">{{ empleado.horasPorPagar }}</td>
               <td class="border border-gray-300 px-4 py-2">{{ empleado.horasExtras }}</td>
-              <td class="border border-gray-300 px-4 py-2">{{ empleado.pagoTotal }}</td>
-              <td class="border border-gray-300 px-4 py-2">
-                <button (click)="iniciarModificacion(empleado.matricula)" class="bg-blue-500 text-white px-2 py-1 rounded">Modificar</button>
-                <button (click)="eliminarEmpleado(empleado.matricula)" class="bg-red-500 text-white px-2 py-1 rounded ml-2">Eliminar</button>
-              </td>
+              <td class="border border-gray-300 px-4 py-2">{{ empleado.subtotal }}</td>
+            </tr>
+
+            <tr>
+              <td colspan="7" class="border border-gray-300 px-4 py-2 text-right font-bold">Total a Pagar:</td>
+              <td class="border border-gray-300 px-4 py-2 font-bold">{{ calcularTotalGeneral() }}</td>
             </tr>
           </tbody>
         </table>
+
+        <div class="mt-4 flex items-center">
+          <input [(ngModel)]="filtroMatricula" placeholder="Buscar por Matrícula" class="border border-gray-300 p-2 rounded mr-2" />
+          <button (click)="iniciarModificacion()" class="py-1 px-2 border border-black rounded mr-2">Modificar</button>
+          <button (click)="eliminarEmpleado()" class="py-1 px-2 border border-black rounded">Eliminar</button>
+        </div>
       </div>
     </div>
   </div>

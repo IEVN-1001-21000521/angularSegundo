@@ -21,10 +21,9 @@ export class EmpleadoComponent {
     correo: string,
     edad: number,
     horasTrabajadas: number,
+    horasPorPagar: number,
     horasExtras: number,
-    pagoHorasRegulares: number,
-    pagoHorasExtras: number,
-    pagoTotal: number
+    subtotal: number
   }> = [];
   mostrarTabla: boolean = false;
   filtroMatricula: string = '';
@@ -38,13 +37,13 @@ export class EmpleadoComponent {
     }
   }
 
-  // Método para registrar o modificar empleado
   registrarEmpleado() {
     if (this.matricula && this.nombre && this.correo && this.edad && this.horasTrabajadas !== null) {
-      const pagoHorasRegulares = this.calcularPagoHorasRegulares(this.horasTrabajadas);
-      const pagoHorasExtras = this.calcularPagoHorasExtras(this.horasTrabajadas);
-      const horasExtras = this.calcularHorasExtras(this.horasTrabajadas);
-      const pagoTotal = pagoHorasRegulares + pagoHorasExtras;
+      const horasPorPagar = this.horasTrabajadas > 40 ? 40 : this.horasTrabajadas;
+      const horasExtras = this.horasTrabajadas > 40 ? this.horasTrabajadas - 40 : 0;
+      const pagoHorasRegulares = horasPorPagar * 70; // Pago por horas regulares
+      const pagoHorasExtras = horasExtras * 140; // Pago por horas extras
+      const subtotal = pagoHorasRegulares + pagoHorasExtras;
 
       const nuevoEmpleado = {
         matricula: this.matricula,
@@ -52,20 +51,17 @@ export class EmpleadoComponent {
         correo: this.correo,
         edad: this.edad,
         horasTrabajadas: this.horasTrabajadas,
-        horasExtras: horasExtras,
-        pagoHorasRegulares: pagoHorasRegulares,
-        pagoHorasExtras: pagoHorasExtras,
-        pagoTotal: pagoTotal
+        horasPorPagar: pagoHorasRegulares, // Mostrar cantidad de dinero
+        horasExtras: pagoHorasExtras, // Mostrar cantidad de dinero
+        subtotal: subtotal
       };
 
       if (this.modoEdicion && this.indiceEdicion !== null) {
-        // Modificar empleado existente
         this.empleadosGuardados[this.indiceEdicion] = nuevoEmpleado;
         this.modoEdicion = false;
         this.indiceEdicion = null;
         alert('Empleado modificado con éxito.');
       } else {
-        // Registrar nuevo empleado
         this.empleadosGuardados.push(nuevoEmpleado);
         alert('Empleado registrado con éxito.');
       }
@@ -77,27 +73,9 @@ export class EmpleadoComponent {
     }
   }
 
-  // Método para calcular el pago de horas regulares (hasta 40 horas)
-  calcularPagoHorasRegulares(horas: number): number {
-    const pagoPorHora = 70;
-    return horas > 40 ? 40 * pagoPorHora : horas * pagoPorHora;
-  }
-
-  // Método para calcular el pago de horas extras (más de 40 horas)
-  calcularPagoHorasExtras(horas: number): number {
-    const pagoPorHoraExtra = 140;
-    return horas > 40 ? (horas - 40) * pagoPorHoraExtra : 0;
-  }
-
-  // Método para calcular las horas extras trabajadas
-  calcularHorasExtras(horas: number): number {
-    return horas > 40 ? horas - 40 : 0;
-  }
-
-  // Método para iniciar la modificación de un empleado por matrícula
-  iniciarModificacion(matricula: string) {
+  iniciarModificacion() {
     const empleado = this.empleadosGuardados.find((emp, index) => {
-      if (emp.matricula === matricula) {
+      if (emp.matricula === this.filtroMatricula) {
         this.indiceEdicion = index;
         return true;
       }
@@ -116,19 +94,18 @@ export class EmpleadoComponent {
     }
   }
 
-  // Método para eliminar empleado por matrícula
-  eliminarEmpleado(matricula: string) {
-    const index = this.empleadosGuardados.findIndex(emp => emp.matricula === matricula);
+  eliminarEmpleado() {
+    const index = this.empleadosGuardados.findIndex(emp => emp.matricula === this.filtroMatricula);
     if (index !== -1) {
       this.empleadosGuardados.splice(index, 1);
       this.actualizarLocalStorage();
       alert('Empleado eliminado con éxito.');
+      this.limpiarCampos();
     } else {
       alert('Empleado no encontrado.');
     }
   }
 
-  // Método para limpiar los campos del formulario
   limpiarCampos() {
     this.matricula = '';
     this.nombre = '';
@@ -139,35 +116,15 @@ export class EmpleadoComponent {
     this.indiceEdicion = null;
   }
 
-  // Método para actualizar los empleados en el localStorage
   actualizarLocalStorage() {
     localStorage.setItem('empleados', JSON.stringify(this.empleadosGuardados));
   }
 
-  // Método para calcular el total de dinero a pagar a todos los empleados
   calcularTotalGeneral(): number {
-    return this.empleadosGuardados.reduce((total, empleado) => total + empleado.pagoTotal, 0);
+    return this.empleadosGuardados.reduce((total, empleado) => total + empleado.subtotal, 0);
   }
 
-  // Método para filtrar empleados por matrícula
-  filtrarEmpleados(): Array<{
-    matricula: string,
-    nombre: string,
-    correo: string,
-    edad: number,
-    horasTrabajadas: number,
-    horasExtras: number,
-    pagoHorasRegulares: number,
-    pagoHorasExtras: number,
-    pagoTotal: number
-  }> {
-    return this.empleadosGuardados.filter(emp =>
-      emp.matricula.toLowerCase().includes(this.filtroMatricula.toLowerCase())
-    );
-  }
-
-  // Método para mostrar u ocultar la tabla
   imprimirTabla() {
-    this.mostrarTabla = !this.mostrarTabla; // Alterna la visibilidad de la tabla
+    this.mostrarTabla = !this.mostrarTabla;
   }
 }
