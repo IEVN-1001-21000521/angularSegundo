@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { Ejemplo1Component } from './formulario/ejemplo1/ejemplo1.component'; // Importa tu componente
 import { ResistenciasComponent } from './formulario/resistencias/resistencias.component'; // Importa tu componente
 import { EmpleadoComponent } from './formulario/empleado/empleado.component'; // Importa tu componente
+import { CapturaPedidoComponent } from './pizzas/captura-pedido/captura-pedido.component';
 
 
 export const routes: Routes = [
@@ -20,5 +21,9 @@ export const routes: Routes = [
   {
     path: 'empleado',  // Define la ruta 'ejemplo1'
     component: EmpleadoComponent  // Asigna el componente Ejemplo1Component para esta ruta
+  },
+  {
+    path: 'pizza',  // Define la ruta 'ejemplo1'
+    component: CapturaPedidoComponent  // Asigna el componente Ejemplo1Component para esta ruta
   }
 ];
