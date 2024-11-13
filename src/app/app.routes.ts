@@ -25,5 +25,9 @@ export const routes: Routes = [
   {
     path: 'pizza',  // Define la ruta 'ejemplo1'
     component: CapturaPedidoComponent  // Asigna el componente Ejemplo1Component para esta ruta
+  },
+  {
+    path: 'utl',
+    loadChildren:()=> import('./utl/utl.routes')
   }
 ];

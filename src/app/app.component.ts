@@ -6,11 +6,12 @@ import { AddMessageComponent } from './team/add-message/add-message.component';
 import { CapturaPedidoComponent } from './pizzas/captura-pedido/captura-pedido.component';
 import { DetallePedidoComponent } from './pizzas/detalle-pedido/detalle-pedido.component';
 import { VentasDiaComponent } from './pizzas/ventas-dia/ventas-dia.component';
+import { NavbarComponent } from './navbar/navbar.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, TemapComponent, ListMessageComponent, AddMessageComponent, CapturaPedidoComponent,DetallePedidoComponent,VentasDiaComponent], // Añade ResistenciasComponent
+  imports: [RouterOutlet, NavbarComponent], // Añade ResistenciasComponent
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
