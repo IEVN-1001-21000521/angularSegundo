@@ -1,10 +1,13 @@
 import { Component,  OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AlumnoFilterPipe } from '../interfaces/alumnos-filter.pipe';
+import { AlumnoFilterPipe } from '../alumnos-filter.pipe';
 import { CommonModule } from '@angular/common';
-import { Alumnosutl } from '../interfaces/alumnosutl';
+import { AlumnosUtl } from '../interfaces/alumnosutl';
 import { ProyectoapiService } from '../proyectoapi.service';
 import { RouterLink } from '@angular/router';
+ 
+ 
+ 
  
 @Component({
   selector: 'app-alumnos',
@@ -29,11 +32,11 @@ export default class AlumnosComponent implements OnInit {
     this.muestraImg=!this.muestraImg;
   }
  
-  alumnosIric:Alumnosutl[]=[
+  alumnosIric:AlumnosUtl[]=[
     {
       matricula:1234,
       nombre:'pedro',
-      apaterno:'lopez',
+      aparterno:'lopez',
       amaterno:'muñoz',
       correo: 'pedro@gmail.com',
  
@@ -41,7 +44,7 @@ export default class AlumnosComponent implements OnInit {
     {
       matricula:772,
       nombre:'Paulina',
-      apaterno:'lopez',
+      aparterno:'lopez',
       amaterno:'muñoz',
       correo: 'paulina@gmail.com',
     },
@@ -49,7 +52,7 @@ export default class AlumnosComponent implements OnInit {
     {
       matricula:22,
       nombre:'Dario',
-      apaterno:'lopez',
+      aparterno:'lopez',
       amaterno:'muñoz',
       correo: 'dario@gmail.com',
  
@@ -71,5 +74,7 @@ export default class AlumnosComponent implements OnInit {
     error: error=>console.log(error)
   }
     );
+ 
 }
+ 
 }

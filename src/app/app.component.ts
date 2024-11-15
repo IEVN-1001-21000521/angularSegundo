@@ -7,6 +7,7 @@ import { CapturaPedidoComponent } from './pizzas/captura-pedido/captura-pedido.c
 import { DetallePedidoComponent } from './pizzas/detalle-pedido/detalle-pedido.component';
 import { VentasDiaComponent } from './pizzas/ventas-dia/ventas-dia.component';
 import { NavbarComponent } from './navbar/navbar.component';
+import AlumnosComponent from './utl/alumnos/alumnos.component';
 
 @Component({
   selector: 'app-root',
